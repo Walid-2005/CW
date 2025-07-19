@@ -56,16 +56,12 @@ class GameScene {
             }
         }
 
-
-
         Text text;
         Random random = new Random();
-        boolean putTwo = true;
-        if (random.nextInt() % 2 == 0)
-            putTwo = false;
+        boolean putTwo = random.nextDouble() < 0.9;  // 90% chance for 2, 10% for 4
         int xCell, yCell;
-            xCell = random.nextInt(aForBound+1);
-            yCell = random.nextInt(bForBound+1);
+        xCell = random.nextInt(aForBound+1);
+        yCell = random.nextInt(bForBound+1);
         if (putTwo) {
             text = textMaker.madeText("2", emptyCells[xCell][yCell].getX(), emptyCells[xCell][yCell].getY(), root);
             emptyCells[xCell][yCell].setTextClass(text);
