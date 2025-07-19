@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import java.util.Random;
 
 class GameScene {
-    private static int HEIGHT = 700;
+    private static int HEIGHT = 500;
     private static int n = 4;
     private final static int distanceBetweenCells = 10;
     private static double LENGTH = (HEIGHT - ((n + 1) * distanceBetweenCells)) / (double) n;
@@ -207,8 +207,11 @@ class GameScene {
         this.root = root;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                cells[i][j] = new Cell((j) * LENGTH + (j + 1) * distanceBetweenCells,
-                        (i) * LENGTH + (i + 1) * distanceBetweenCells, LENGTH, root);
+               double offsetX = (Main.WIDTH - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
+               double offsetY = (Main.HEIGHT - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
+                cells[i][j] = new Cell(offsetX + (j) * LENGTH + (j + 1) * distanceBetweenCells,
+                offsetY + (i) * LENGTH + (i + 1) * distanceBetweenCells, LENGTH, root);
+
             }
         }
 
