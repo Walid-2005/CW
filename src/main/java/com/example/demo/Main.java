@@ -6,13 +6,13 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,7 +22,7 @@ public class Main extends Application {
     static final int HEIGHT = 900;
     private Group gameRoot = new Group();
     private Scene gameScene = new Scene(gameRoot, WIDTH, HEIGHT, Color.rgb(189, 177, 92));
-    private static Scanner input= new Scanner(System.in);
+    private static Scanner input = new Scanner(System.in);
 
     public void setGameScene(Scene gameScene) {
         this.gameScene = gameScene;
@@ -48,7 +48,6 @@ public class Main extends Application {
         BackgroundFill background_fill = new BackgroundFill(Color.rgb(120, 100, 100), CornerRadii.EMPTY, Insets.EMPTY);
         Background background = new Background(background_fill);
 
-
         Rectangle backgroundOfMenu = new Rectangle(240, 120, Color.rgb(120, 120, 120, 0.2));
         backgroundOfMenu.setX(WIDTH / 2 - 120);
         backgroundOfMenu.setY(180);
@@ -63,6 +62,15 @@ public class Main extends Application {
         setGameRoot(gameRoot);
         Scene gameScene = new Scene(gameRoot, WIDTH, HEIGHT, Color.rgb(189, 177, 92));
         setGameScene(gameScene);
+
+        // 🌌 Add animated GIF background
+        Image gif = new Image(getClass().getResource("background.gif").toExternalForm());
+        ImageView gifView = new ImageView(gif);
+        gifView.setFitWidth(WIDTH);
+        gifView.setFitHeight(HEIGHT);
+        gifView.setPreserveRatio(false);
+        gameRoot.getChildren().add(0, gifView); // Add as background layer
+
         primaryStage.setScene(gameScene);
         GameScene game = new GameScene();
         game.game(gameScene, gameRoot, primaryStage, endGameScene, endgameRoot);
