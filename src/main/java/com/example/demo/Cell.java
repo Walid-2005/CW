@@ -61,48 +61,47 @@ public class Cell {
         return addedValue;
     }
 
-    void setColorByNumber(int number) {
-        switch (number) {
-            case 0:
+  void setColorByNumber(int number) {
+    switch (number) {
+         case 0:
                 rectangle.setFill(Color.rgb(224, 226, 226, 0.5));
                 break;
-            case 2:
-                rectangle.setFill(Color.rgb(232, 255, 100, 0.5));
-                break;
-            case 4:
-                rectangle.setFill(Color.rgb(232, 220, 50, 0.5));
-                break;
-            case 8:
-                rectangle.setFill(Color.rgb(232, 200, 44, 0.8));
-                break;
-            case 16:
-                rectangle.setFill(Color.rgb(232, 170, 44, 0.8));
-                break;
-            case 32:
-                rectangle.setFill(Color.rgb(180, 120, 44, 0.7));
-                break;
-            case 64:
-                rectangle.setFill(Color.rgb(180, 100, 44, 0.7));
-                break;
-            case 128:
-                rectangle.setFill(Color.rgb(180, 80, 44, 0.7));
-                break;
-            case 256:
-                rectangle.setFill(Color.rgb(180, 60, 44, 0.8));
-                break;
-            case 512:
-                rectangle.setFill(Color.rgb(180, 30, 44, 0.8));
-                break;
-            case 1024:
-                rectangle.setFill(Color.rgb(250, 0, 44, 0.8));
-                break;
-            case 2048:
-                rectangle.setFill(Color.rgb(250,0,0,1));
-
-
-        }
-
+        case 2:
+            rectangle.setFill(Color.rgb(255, 228, 181, 0.6)); // moccasin
+            break;
+        case 4:
+            rectangle.setFill(Color.rgb(255, 204, 153, 0.7)); // peach
+            break;
+        case 8:
+            rectangle.setFill(Color.rgb(255, 153, 102, 0.75)); // light pumpkin
+            break;
+        case 16:
+            rectangle.setFill(Color.rgb(255, 128, 0, 0.8)); // pumpkin orange
+            break;
+        case 32:
+            rectangle.setFill(Color.rgb(255, 102, 0, 0.85)); // deeper orange
+            break;
+        case 64:
+            rectangle.setFill(Color.rgb(204, 85, 0, 0.85)); // burnt orange
+            break;
+        case 128:
+            rectangle.setFill(Color.rgb(153, 76, 0, 0.9)); // dark pumpkin
+            break;
+        case 256:
+            rectangle.setFill(Color.rgb(178, 34, 34, 0.9)); // firebrick
+            break;
+        case 512:
+            rectangle.setFill(Color.rgb(139, 0, 0, 0.9)); // dark red
+            break;
+        case 1024:
+            rectangle.setFill(Color.rgb(128, 0, 32, 0.95)); // cranberry red
+            break;
+        case 2048:
+            rectangle.setFill(Color.rgb(112, 41, 99, 1)); // plum/dark burgundy
+            break;
     }
+}
+
 
     double getX() {
         return rectangle.getX();
