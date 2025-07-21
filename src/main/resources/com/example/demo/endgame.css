@@ -1,0 +1,16 @@
+.button {
+    -fx-background-color: #8B0000; /* Dark red */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-radius: 15;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-border-color: transparent;
+}
+
+.button:hover {
+    -fx-background-color: #B22222; /* Lighter red */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}

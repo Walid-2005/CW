@@ -63,7 +63,7 @@ public class Main extends Application {
         Scene gameScene = new Scene(gameRoot, WIDTH, HEIGHT, Color.rgb(189, 177, 92));
         setGameScene(gameScene);
 
-        // 🌌 Add animated GIF background
+        // Add animated GIF background
         Image gif = new Image(getClass().getResource("background.gif").toExternalForm());
         ImageView gifView = new ImageView(gif);
         gifView.setFitWidth(WIDTH);
@@ -80,5 +80,26 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    // Restart game method
+    public static void restartGame(Stage primaryStage) {
+        Group gameRoot = new Group();
+        Scene gameScene = new Scene(gameRoot, WIDTH, HEIGHT);
+        Group endGameRoot = new Group();
+        Scene endGameScene = new Scene(endGameRoot, WIDTH, HEIGHT);
+
+        // Re-add background gif
+        Image gif = new Image(Main.class.getResource("background.gif").toExternalForm());
+        ImageView gifView = new ImageView(gif);
+        gifView.setFitWidth(WIDTH);
+        gifView.setFitHeight(HEIGHT);
+        gifView.setPreserveRatio(false);
+        gameRoot.getChildren().add(0, gifView);
+
+        GameScene game = new GameScene();
+        game.game(gameScene, gameRoot, primaryStage, endGameScene, endGameRoot);
+
+        primaryStage.setScene(gameScene);
     }
 }
