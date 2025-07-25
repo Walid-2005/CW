@@ -47,13 +47,13 @@ public class EndGame {
 
         // Load game-over.png
         URL overUrl = getClass().getResource("/com/example/demo/game-over.png");
-        double gameOverY = 200;
+        double gameOverY = 185;
         if (overUrl != null) {
             Image gameOver = new Image(overUrl.toExternalForm());
             ImageView gameOverView = new ImageView(gameOver);
-            gameOverView.setFitWidth(620);
+            gameOverView.setFitWidth(420);
             gameOverView.setPreserveRatio(true);
-            gameOverView.relocate((Main.WIDTH - 630) / 2.0, gameOverY);
+            gameOverView.relocate((Main.WIDTH - 430) / 2.0, gameOverY);
             root.getChildren().add(gameOverView);
         } else {
             System.out.println("❌ game-over.png not found.");
