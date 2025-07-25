@@ -3,6 +3,9 @@ package com.example.demo;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
@@ -21,6 +24,8 @@ class GameScene {
     private Group root;
     private long score = 0;
     private Text scoretext;
+    private boolean isDarkMode = false;
+    private ImageView backgroundView;
 
     static void setN(int number) {
         n = number;
@@ -205,13 +210,21 @@ class GameScene {
 
     void game(Scene gameScene, Group root, Stage primaryStage, Scene endGameScene, Group endGameRoot) {
         this.root = root;
+
+        Image background = new Image(getClass().getResource("background.gif").toExternalForm());
+        backgroundView = new ImageView(background);
+        backgroundView.setFitWidth(Main.WIDTH);
+        backgroundView.setFitHeight(Main.HEIGHT);
+        backgroundView.setPreserveRatio(false);
+        backgroundView.setMouseTransparent(true); // <- required fix
+        root.getChildren().add(0, backgroundView);
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-               double offsetX = (Main.WIDTH - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
-               double offsetY = (Main.HEIGHT - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
+                double offsetX = (Main.WIDTH - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
+                double offsetY = (Main.HEIGHT - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
                 cells[i][j] = new Cell(offsetX + (j) * LENGTH + (j + 1) * distanceBetweenCells,
-                offsetY + (i) * LENGTH + (i + 1) * distanceBetweenCells, LENGTH, root);
-
+                        offsetY + (i) * LENGTH + (i + 1) * distanceBetweenCells, LENGTH, root);
             }
         }
 
@@ -224,6 +237,30 @@ class GameScene {
         scoretext.setFont(Font.font(20));
         scoretext.relocate(750, 150);
         root.getChildren().add(scoretext);
+
+        Button toggleMode = new Button("Dark Mode");
+        toggleMode.setLayoutX(750);
+        toggleMode.setLayoutY(200);
+        toggleMode.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+        root.getChildren().add(toggleMode);
+
+        toggleMode.setOnAction(e -> {
+            isDarkMode = !isDarkMode;
+            String gifPath = isDarkMode ? "dark-background.gif" : "background.gif";
+            Image newBackground = new Image(getClass().getResource(gifPath).toExternalForm());
+            backgroundView.setImage(newBackground);
+            toggleMode.setText(isDarkMode ? "Light Mode" : "Dark Mode");
+            toggleMode.setStyle(isDarkMode
+                    ? "-fx-background-color: white; -fx-text-fill: black;"
+                    : "-fx-background-color: black; -fx-text-fill: white;");
+            Cell.setDarkMode(isDarkMode);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    cells[i][j].setColorByNumber(cells[i][j].getNumber());
+                    root.requestFocus();
+                }
+            }
+        });
 
         randomFillNumber(1);
         randomFillNumber(1);
