@@ -253,8 +253,16 @@ class GameScene {
         backgroundView.setPreserveRatio(false);
         backgroundView.setMouseTransparent(true);
         root.getChildren().add(0, backgroundView);
-
-        for (int i = 0; i < n; i++) {
+         
+        Image logo = new Image(getClass().getResource("/com/example/demo/2048_LOGO.png").toExternalForm());
+        ImageView logoView = new ImageView(logo);
+        logoView.setFitWidth(290);
+        logoView.setPreserveRatio(true);
+        logoView.setLayoutX((Main.WIDTH - 270) / 2.0); // centered horizontally
+        logoView.setLayoutY(-80); // positioned above the grid
+        root.getChildren().add(logoView);
+        
+    for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 double offsetX = (Main.WIDTH - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
                 double offsetY = (Main.HEIGHT - ((n * LENGTH) + (n + 1) * distanceBetweenCells)) / 2;
@@ -262,6 +270,17 @@ class GameScene {
                         offsetY + (i) * LENGTH + (i + 1) * distanceBetweenCells, LENGTH, root);
             }
         }
+                        // Add New Game button under logo
+            Button newGameButton = new Button("New Game");
+            newGameButton.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+            newGameButton.setFont(Font.font("Arial", 13));
+            newGameButton.setLayoutX((Main.WIDTH - -150 ) / 2.0); // Centered
+            newGameButton.setLayoutY(logoView.getLayoutY() + logoView.getFitHeight() + 212); // Just below logo
+            root.getChildren().add(newGameButton);
+
+            newGameButton.setOnAction(e -> {
+                Main.restartGame(primaryStage); // Make sure this method exists in Main.java
+            });
 
         Text label = new Text("SCORE:");
         label.setFont(Font.font("Arial", 18));
@@ -272,7 +291,7 @@ class GameScene {
         scoretext = new Text("0");
         scoretext.setFont(Font.font("Arial", 18));
         scoretext.setFill(Color.WHITE);
-        scoretext.relocate(870, 16);
+        scoretext.relocate(864, 16);
         root.getChildren().add(scoretext);
 
         highScoreText = new Text("HIGH SCORE: " + highScore);
@@ -282,8 +301,8 @@ class GameScene {
         root.getChildren().add(highScoreText);
 
         Button toggleMode = new Button("Dark Mode");
-        toggleMode.setLayoutX(750);
-        toggleMode.setLayoutY(200);
+        toggleMode.setLayoutX(300);
+        toggleMode.setLayoutY(130);
         toggleMode.setStyle("-fx-background-color: black; -fx-text-fill: white;");
         root.getChildren().add(toggleMode);
 
