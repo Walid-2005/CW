@@ -8,10 +8,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.*;
 import java.util.Random;
 
 class GameScene {
@@ -23,9 +25,12 @@ class GameScene {
     private Cell[][] cells = new Cell[n][n];
     private Group root;
     private long score = 0;
+    private long highScore = 0;
     private Text scoretext;
+    private Text highScoreText;
     private boolean isDarkMode = false;
     private ImageView backgroundView;
+    private final File highScoreFile = new File("src/main/resources/highscore.txt");
 
     static void setN(int number) {
         n = number;
@@ -137,7 +142,7 @@ class GameScene {
     private void moveHorizontally(int i, int j, int des, int sign) {
         if (isValidDesH(i, j, des, sign)) {
             score += cells[i][j].adder(cells[i][des + sign]);
-            scoretext.setText(score + "");
+            updateScore();
             cells[i][des].setModify(true);
         } else if (des != j) {
             cells[i][j].changeCell(cells[i][des]);
@@ -147,7 +152,7 @@ class GameScene {
     private void moveVertically(int i, int j, int des, int sign) {
         if (isValidDesV(i, j, des, sign)) {
             score += cells[i][j].adder(cells[des + sign][j]);
-            scoretext.setText(score + "");
+            updateScore();
             cells[des][j].setModify(true);
         } else if (des != i) {
             cells[i][j].changeCell(cells[des][j]);
@@ -208,15 +213,45 @@ class GameScene {
         return true;
     }
 
+    private void updateScore() {
+        scoretext.setText(score + "");
+        if (score > highScore) {
+            highScore = score;
+            highScoreText.setText("HIGH SCORE: " + highScore);
+            saveHighScore();
+        }
+    }
+
+    private void loadHighScore() {
+        try {
+            if (highScoreFile.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(highScoreFile));
+                highScore = Long.parseLong(reader.readLine());
+                reader.close();
+            }
+        } catch (IOException | NumberFormatException e) {
+            highScore = 0;
+        }
+    }
+
+    private void saveHighScore() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(highScoreFile));
+            writer.write(Long.toString(highScore));
+            writer.close();
+        } catch (IOException ignored) {}
+    }
+
     void game(Scene gameScene, Group root, Stage primaryStage, Scene endGameScene, Group endGameRoot) {
         this.root = root;
+        loadHighScore();
 
         Image background = new Image(getClass().getResource("background.gif").toExternalForm());
         backgroundView = new ImageView(background);
         backgroundView.setFitWidth(Main.WIDTH);
         backgroundView.setFitHeight(Main.HEIGHT);
         backgroundView.setPreserveRatio(false);
-        backgroundView.setMouseTransparent(true); // <- required fix
+        backgroundView.setMouseTransparent(true);
         root.getChildren().add(0, backgroundView);
 
         for (int i = 0; i < n; i++) {
@@ -228,15 +263,23 @@ class GameScene {
             }
         }
 
-        Text label = new Text("SCORE :");
-        label.setFont(Font.font(30));
-        label.relocate(750, 100);
+        Text label = new Text("SCORE:");
+        label.setFont(Font.font("Arial", 18));
+        label.setFill(Color.WHITE);
+        label.relocate(790, 16);
         root.getChildren().add(label);
 
         scoretext = new Text("0");
-        scoretext.setFont(Font.font(20));
-        scoretext.relocate(750, 150);
+        scoretext.setFont(Font.font("Arial", 18));
+        scoretext.setFill(Color.WHITE);
+        scoretext.relocate(870, 16);
         root.getChildren().add(scoretext);
+
+        highScoreText = new Text("HIGH SCORE: " + highScore);
+        highScoreText.setFont(Font.font("Arial", 18));
+        highScoreText.setFill(Color.WHITE);
+        highScoreText.relocate(20, 20);
+        root.getChildren().add(highScoreText);
 
         Button toggleMode = new Button("Dark Mode");
         toggleMode.setLayoutX(750);
@@ -259,6 +302,7 @@ class GameScene {
                     cells[i][j].setColorByNumber(cells[i][j].getNumber());
                 }
             }
+            root.requestFocus();
         });
 
         randomFillNumber(1);

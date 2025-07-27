@@ -47,7 +47,7 @@ public class EndGame {
 
         // Load game-over.png
         URL overUrl = getClass().getResource("/com/example/demo/game-over.png");
-        double gameOverY = 185;
+        double gameOverY = 15;
         if (overUrl != null) {
             Image gameOver = new Image(overUrl.toExternalForm());
             ImageView gameOverView = new ImageView(gameOver);
@@ -69,7 +69,7 @@ public class EndGame {
         // Button layout
         int buttonWidth = 120;
         int buttonHeight = 40;
-        double buttonY = gameOverY + 320;
+        double buttonY = gameOverY + 400;
         double spacing = 60;
         double totalWidth = 2 * buttonWidth + spacing;
         double startX = (Main.WIDTH - totalWidth) / 2;
