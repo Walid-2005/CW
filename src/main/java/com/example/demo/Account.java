@@ -1,19 +1,19 @@
 package com.example.demo;
 
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Account implements Comparable<Account> {
+public class Account implements Comparable<Account>, Serializable {
     private long score = 0;
     private String userName ;
     private static ArrayList<Account> accounts = new ArrayList<>();
+    private static final String SAVE_FILE = "src/main/resources/accounts.dat";
 
     public Account(String userName){
         this.userName=userName;
@@ -28,11 +28,16 @@ public class Account implements Comparable<Account> {
         this.score += score;
     }
 
-    private long getScore() {
+    public long getScore() {
         return score;
     }
 
-    private String getUserName() {
+    public String getUserName() {
+        return userName;
+    }
+
+    // Alias for compatibility with getUsername() references
+    public String getUsername() {
         return userName;
     }
 
@@ -43,7 +48,6 @@ public class Account implements Comparable<Account> {
             }
         }
         return null;
-
     }
 
     static Account makeNewAccount(String userName){
@@ -52,4 +56,34 @@ public class Account implements Comparable<Account> {
         return account;
     }
 
+    public static void saveAccounts() {
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(SAVE_FILE));
+            out.writeObject(accounts);
+            out.close();
+        } catch (IOException e) {
+            System.out.println("❌ Failed to save accounts.");
+        }
+    }
+
+    public static void loadAccounts() {
+        try {
+            File file = new File(SAVE_FILE);
+            if (!file.exists()) return;
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+            accounts = (ArrayList<Account>) in.readObject();
+            in.close();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("❌ Failed to load accounts.");
+        }
+    }
+
+    public static ArrayList<Account> getAccounts() {
+        return accounts;
+    }
+
+    @Override
+    public String toString() {
+        return userName + ": " + score;
+    }
 }
