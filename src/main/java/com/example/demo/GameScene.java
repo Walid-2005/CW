@@ -46,6 +46,7 @@ class GameScene {
 
     void game(Scene gameScene, Group root, Stage primaryStage, Scene endGameScene, Group endGameRoot, Account account) {
         this.root = root;
+        gameScene.getStylesheets().add(getClass().getResource("/com/example/demo/home_buttons.css").toExternalForm());
         this.currentAccount = account;
         loadHighScore();
 
@@ -61,7 +62,7 @@ class GameScene {
         ImageView logoView = new ImageView(logo);
         logoView.setFitWidth(290);
         logoView.setPreserveRatio(true);
-        logoView.setLayoutX((Main.WIDTH - 270) / 2.0);
+        logoView.setLayoutX((Main.WIDTH - 240) / 2.0);
         logoView.setLayoutY(-80);
         root.getChildren().add(logoView);
 
@@ -77,8 +78,8 @@ class GameScene {
         Button newGameButton = new Button("New Game");
         newGameButton.setStyle("-fx-background-color: black; -fx-text-fill: white;");
         newGameButton.setFont(Font.font("Arial", 13));
-        newGameButton.setLayoutX((Main.WIDTH - -150) / 2.0);
-        newGameButton.setLayoutY(logoView.getLayoutY() + logoView.getFitHeight() + 212);
+        newGameButton.setLayoutX((Main.WIDTH - -160) / 2.0);
+        newGameButton.setLayoutY(logoView.getLayoutY() + logoView.getFitHeight() + 210);
         root.getChildren().add(newGameButton);
         newGameButton.setOnAction(e -> Main.restartGame(primaryStage));
 
