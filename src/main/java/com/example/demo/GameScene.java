@@ -1,5 +1,9 @@
 package com.example.demo;
 
+
+import javafx.util.Duration;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -81,7 +85,19 @@ class GameScene {
         newGameButton.setLayoutX((Main.WIDTH - -160) / 2.0);
         newGameButton.setLayoutY(logoView.getLayoutY() + logoView.getFitHeight() + 210);
         root.getChildren().add(newGameButton);
-        newGameButton.setOnAction(e -> Main.restartGame(primaryStage));
+        newGameButton.setOnAction(e -> { 
+            Main.restartGame(primaryStage);
+            Cell.setDarkMode(false);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    cells[i][j].setColorByNumber(cells[i][j].getNumber());
+                }
+            }
+        
+        
+        });
+
+
 
         Text label = new Text("SCORE:");
         label.setFont(Font.font("Arial", 18));
@@ -166,7 +182,8 @@ class GameScene {
             }
             root.requestFocus();
         });
-
+       
+        //First Two numbers to be called on grid
         randomFillNumber(1);
         randomFillNumber(1);
 
@@ -176,7 +193,7 @@ class GameScene {
             else if (key.getCode() == KeyCode.UP) moveUp();
             else if (key.getCode() == KeyCode.LEFT) moveLeft();
             else if (key.getCode() == KeyCode.RIGHT) moveRight();
-
+            else return;
             emptyCellCheck = haveEmptyCell();
             if (emptyCellCheck == -1 && canNotMove()) {
                 currentAccount.addToScore(score);
@@ -190,6 +207,45 @@ class GameScene {
             }
         }));
     }
+    
+    private void animateMovements(List<Movement> movements) {
+    for (Movement m : movements) {
+        Cell fromCell = cells[m.fromRow][m.fromCol];
+        Cell toCell = cells[m.toRow][m.toCol];
+
+        double dx = (m.toCol - m.fromCol) * (LENGTH + distanceBetweenCells);
+        double dy = (m.toRow - m.fromRow) * (LENGTH + distanceBetweenCells);
+
+        TranslateTransition moveRect = new TranslateTransition(Duration.millis(150), fromCell.getRectangle());
+        moveRect.setByX(dx);
+        moveRect.setByY(dy);
+
+        TranslateTransition moveText = new TranslateTransition(Duration.millis(150), fromCell.getText());
+        moveText.setByX(dx);
+        moveText.setByY(dy);
+
+        ParallelTransition pt = new ParallelTransition(moveRect, moveText);
+
+        pt.setOnFinished(e -> {
+            // Reset position
+            fromCell.getRectangle().setTranslateX(0);
+            fromCell.getRectangle().setTranslateY(0);
+            fromCell.getText().setTranslateX(0);
+            fromCell.getText().setTranslateY(0);
+
+            // Logical state change
+            toCell.setValue(m.value);
+            fromCell.setValue(0);
+        });
+
+        pt.play();
+    }
+}
+
+
+
+
+
 
     // Movement and Helper Methods
 
@@ -234,6 +290,17 @@ class GameScene {
             }
         return -1;
     }
+    public class Movement {
+        int fromRow, fromCol, toRow, toCol, value;
+
+        public Movement(int fromRow, int fromCol, int toRow, int toCol, int value) {
+        this.fromRow = fromRow;
+        this.fromCol = fromCol;
+        this.toRow = toRow;
+        this.toCol = toCol;
+        this.value = value;
+    }
+}
 
     private boolean haveSameNumberNearly(int i, int j) {
         return (i < n - 1 && cells[i + 1][j].getNumber() == cells[i][j].getNumber()) ||
@@ -255,7 +322,7 @@ class GameScene {
             saveHighScore();
         }
     }
-
+        
     private void loadHighScore() {
         try {
             if (highScoreFile.exists()) {
@@ -276,35 +343,189 @@ class GameScene {
         } catch (IOException ignored) {}
     }
 
-    private void moveLeft() {
-        for (int i = 0; i < n; i++) {
-            for (int j = 1; j < n; j++) moveHorizontally(i, j, passDestination(i, j, 'l'), -1);
-            for (int j = 0; j < n; j++) cells[i][j].setModify(false);
-        }
-    }
+private void moveLeft() {
+    List<Movement> moves = new ArrayList<>();
 
-    private void moveRight() {
-        for (int i = 0; i < n; i++) {
-            for (int j = n - 1; j >= 0; j--) moveHorizontally(i, j, passDestination(i, j, 'r'), 1);
-            for (int j = 0; j < n; j++) cells[i][j].setModify(false);
-        }
-    }
-
-    private void moveUp() {
+    for (int i = 0; i < n; i++) {
+        System.out.println("Row " + i + " -----------------------------");
+        
+        int[] originalRow = new int[n];
         for (int j = 0; j < n; j++) {
-            for (int i = 1; i < n; i++) moveVertically(i, j, passDestination(i, j, 'u'), -1);
-            for (int i = 0; i < n; i++) cells[i][j].setModify(false);
+            originalRow[j] = cells[i][j].getValue();
+        }
+
+        int[] newRow = new int[n];
+        boolean[] merged = new boolean[n];
+        int insertCol = 0;
+
+        for (int j = 0; j < n; j++) {
+            int val = originalRow[j];
+            if (val == 0) continue;
+
+            if (insertCol > 0 && newRow[insertCol - 1] == val && !merged[insertCol - 1]) {
+                newRow[insertCol - 1] *= 2;
+                merged[insertCol - 1] = true;
+                score += newRow[insertCol - 1];
+                updateScore();
+                moves.add(new Movement(i, j, i, insertCol - 1, newRow[insertCol - 1]));
+                System.out.println("Merged: (" + i + "," + j + ") → (" + i + "," + (insertCol - 1) + ") = " + newRow[insertCol - 1]);
+            } else {
+                newRow[insertCol] = val;
+                if (j != insertCol) {
+                    moves.add(new Movement(i, j, i, insertCol, val));
+                    System.out.println("Moved: (" + i + "," + j + ") → (" + i + "," + insertCol + ") = " + val);
+                } else {
+                    System.out.println("Stays in place: (" + i + "," + j + ") at (" + i + "," + insertCol + ")");
+                }
+                insertCol++;
+            }
         }
     }
+
+    animateMovements(moves);
+}
+
+private void moveRight() {
+    List<Movement> moves = new ArrayList<>();
+
+    for (int i = 0; i < n; i++) {
+        System.out.println("Row " + i + " -----------------------------");
+
+        int[] originalRow = new int[n];
+        for (int j = 0; j < n; j++) {
+            originalRow[j] = cells[i][j].getValue();
+        }
+
+        int[] newRow = new int[n];
+        boolean[] merged = new boolean[n];
+        int insertCol = n - 1;
+
+        for (int j = n - 1; j >= 0; j--) {
+            int val = originalRow[j];
+            if (val == 0) continue;
+
+            if (insertCol < n - 1 && newRow[insertCol + 1] == val && !merged[insertCol + 1]) {
+                newRow[insertCol + 1] *= 2;
+                merged[insertCol + 1] = true;
+                score += newRow[insertCol + 1];
+                updateScore();
+                moves.add(new Movement(i, j, i, insertCol + 1, newRow[insertCol + 1]));
+                System.out.println("Merged: (" + i + "," + j + ") → (" + i + "," + (insertCol + 1) + ") = " + newRow[insertCol + 1]);
+            } else {
+                newRow[insertCol] = val;
+                if (j != insertCol) {
+                    moves.add(new Movement(i, j, i, insertCol, val));
+                    System.out.println("Moved: (" + i + "," + j + ") → (" + i + "," + insertCol + ") = " + val);
+                } else {
+                    System.out.println("Stays in place: (" + i + "," + j + ") at (" + i + "," + insertCol + ")");
+                }
+                insertCol--;
+            }
+        }
+    }
+
+    animateMovements(moves);
+}
+
+
+
+
+
+    
+
+   private void moveUp() {
+    List<Movement> moves = new ArrayList<>();
+
+    for (int j = 0; j < n; j++) {
+        System.out.println("Column " + j + " ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑");
+
+        int[] originalCol = new int[n];
+        for (int i = 0; i < n; i++) {
+            originalCol[i] = cells[i][j].getValue();
+        }
+
+        int[] newCol = new int[n];
+        boolean[] merged = new boolean[n];
+        int insertRow = 0;
+
+        for (int i = 0; i < n; i++) {
+            int val = originalCol[i];
+            if (val == 0) continue;
+
+            if (insertRow > 0 && newCol[insertRow - 1] == val && !merged[insertRow - 1]) {
+                newCol[insertRow - 1] *= 2;
+                merged[insertRow - 1] = true;
+                score += newCol[insertRow - 1];
+                updateScore();
+                moves.add(new Movement(i, j, insertRow - 1, j, newCol[insertRow - 1]));
+                System.out.println("Merged: (" + i + "," + j + ") → (" + (insertRow - 1) + "," + j + ") = " + newCol[insertRow - 1]);
+            } else {
+                newCol[insertRow] = val;
+                if (i != insertRow) {
+                    moves.add(new Movement(i, j, insertRow, j, val));
+                    System.out.println("Moved: (" + i + "," + j + ") → (" + insertRow + "," + j + ") = " + val);
+                } else {
+                    System.out.println("Stays in place: (" + i + "," + j + ") at (" + insertRow + "," + j + ")");
+                }
+                insertRow++;
+            }
+        }
+    }
+
+    animateMovements(moves);
+}
+
+
 
     private void moveDown() {
-        for (int j = 0; j < n; j++) {
-            for (int i = n - 1; i >= 0; i--) moveVertically(i, j, passDestination(i, j, 'd'), 1);
-            for (int i = 0; i < n; i++) cells[i][j].setModify(false);
+    List<Movement> moves = new ArrayList<>();
+
+    for (int j = 0; j < n; j++) {
+        System.out.println("Column " + j + " ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓");
+
+        int[] originalCol = new int[n];
+        for (int i = 0; i < n; i++) {
+            originalCol[i] = cells[i][j].getValue();
+        }
+
+        int[] newCol = new int[n];
+        boolean[] merged = new boolean[n];
+        int insertRow = n - 1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            int val = originalCol[i];
+            if (val == 0) continue;
+
+            if (insertRow < n - 1 && newCol[insertRow + 1] == val && !merged[insertRow + 1]) {
+                newCol[insertRow + 1] *= 2;
+                merged[insertRow + 1] = true;
+                score += newCol[insertRow + 1];
+                updateScore();
+                moves.add(new Movement(i, j, insertRow + 1, j, newCol[insertRow + 1]));
+                System.out.println("Merged: (" + i + "," + j + ") → (" + (insertRow + 1) + "," + j + ") = " + newCol[insertRow + 1]);
+            } else {
+                newCol[insertRow] = val;
+                if (i != insertRow) {
+                    moves.add(new Movement(i, j, insertRow, j, val));
+                    System.out.println("Moved: (" + i + "," + j + ") → (" + insertRow + "," + j + ") = " + val);
+                } else {
+                    System.out.println("Stays in place: (" + i + "," + j + ") at (" + insertRow + "," + j + ")");
+                }
+                insertRow--;
+            }
         }
     }
 
-    private void moveHorizontally(int i, int j, int des, int sign) {
+    animateMovements(moves);
+}
+
+
+
+  
+
+  
+
+  private void moveHorizontally(int i, int j, int des, int sign) {
         if (isValidDesH(i, j, des, sign)) {
             score += cells[i][j].adder(cells[i][des + sign]);
             updateScore();
@@ -314,16 +535,21 @@ class GameScene {
         }
     }
 
-    private void moveVertically(int i, int j, int des, int sign) {
-        if (isValidDesV(i, j, des, sign)) {
-            score += cells[i][j].adder(cells[des + sign][j]);
-            updateScore();
-            cells[des][j].setModify(true);
-        } else if (des != i) {
-            cells[i][j].changeCell(cells[des][j]);
-        }
+ private void moveVertically(int i, int j, int des, int sign) {
+    if (isValidDesV(i, j, des, sign)) {
+        // Valid merge
+        score += cells[i][j].adder(cells[des + sign][j]);
+        updateScore();
+        cells[des][j].setModify(true);
+    } else if (des != i && cells[des][j].getValue() == 0) {
+        // Only move if destination is empty
+        cells[i][j].changeCell(cells[des][j]);
     }
+}
 
+
+
+  
     private boolean isValidDesH(int i, int j, int des, int sign) {
         return (des + sign < n && des + sign >= 0 &&
                 cells[i][des + sign].getNumber() == cells[i][j].getNumber() &&

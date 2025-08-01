@@ -62,7 +62,7 @@ public class Account implements Comparable<Account>, Serializable {
             out.writeObject(accounts);
             out.close();
         } catch (IOException e) {
-            System.out.println("❌ Failed to save accounts.");
+            System.out.println(" Failed to save accounts.");
         }
     }
 
@@ -74,7 +74,7 @@ public class Account implements Comparable<Account>, Serializable {
             accounts = (ArrayList<Account>) in.readObject();
             in.close();
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("❌ Failed to load accounts.");
+            System.out.println(" Failed to load accounts.");
         }
     }
 

@@ -155,11 +155,40 @@ public class Cell {
         return rectangle.getY();
     }
 
-    int getNumber() {
-        return Integer.parseInt(textClass.getText());
+    public int getValue() {
+        return this.getNumber();
     }
 
-    private Text getTextClass() {
+    int getNumber() {
+        try {
+            return Integer.parseInt(textClass.getText());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public void setValue(int value) {
+        textClass.setText(Integer.toString(value));
+        setColorByNumber(value);
+        if (value == 0) {
+            root.getChildren().remove(textClass);
+        } else {
+            if (!root.getChildren().contains(textClass)) {
+                root.getChildren().add(textClass);
+            }
+        }
+    }
+
+    // Required for animation
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public Text getText() {
+        return textClass;
+    }
+
+    public Text getTextClass() {
         return textClass;
     }
 }
