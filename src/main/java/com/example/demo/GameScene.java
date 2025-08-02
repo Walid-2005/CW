@@ -3,6 +3,7 @@ package com.example.demo;
 
 import javafx.util.Duration;
 import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -203,13 +204,13 @@ class GameScene {
                 EndGame.getInstance().endGameShow(endGameScene, endGameRoot, primaryStage, score);
                 root.getChildren().clear();
                 score = 0;
-            } else if (emptyCellCheck == 1) {
-                randomFillNumber(2);
-            }
+            } 
         }));
     }
     
-   private void animateMovements(List<Movement> moves, Runnable onFinished) {
+private void animateMovements(List<Movement> moves, Runnable onFinished) {
+    if (moves.isEmpty()) return; // ← No moves = no spawn
+
     SequentialTransition seq = new SequentialTransition();
 
     for (Movement m : moves) {
@@ -217,12 +218,12 @@ class GameScene {
         Cell toCell = cells[m.toRow][m.toCol];
 
         TranslateTransition trans = new TranslateTransition(Duration.millis(100), fromCell.getRectangle());
-        trans.setToX((toCell.getX() - fromCell.getX()));
-        trans.setToY((toCell.getY() - fromCell.getY()));
+        trans.setToX(toCell.getX() - fromCell.getX());
+        trans.setToY(toCell.getY() - fromCell.getY());
 
         TranslateTransition textTrans = new TranslateTransition(Duration.millis(100), fromCell.getText());
-        textTrans.setToX((toCell.getX() - fromCell.getX()));
-        textTrans.setToY((toCell.getY() - fromCell.getY()));
+        textTrans.setToX(toCell.getX() - fromCell.getX());
+        textTrans.setToY(toCell.getY() - fromCell.getY());
 
         ParallelTransition pt = new ParallelTransition(trans, textTrans);
         pt.setOnFinished(e -> {
@@ -230,7 +231,6 @@ class GameScene {
                 toCell.setValue(m.value);
                 fromCell.setValue(0);
             }
-            // Reset translations to avoid ghosts
             fromCell.getRectangle().setTranslateX(0);
             fromCell.getRectangle().setTranslateY(0);
             fromCell.getText().setTranslateX(0);
@@ -253,40 +253,63 @@ class GameScene {
 
 
 
+
     // Movement and Helper Methods
 
     private void randomFillNumber(int turn) {
-        Cell[][] emptyCells = new Cell[n][n];
-        int a = 0, b = 0, aForBound = 0, bForBound = 0;
-        outer:
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (cells[i][j].getNumber() == 0) {
-                    emptyCells[a][b] = cells[i][j];
-                    if (b < n - 1) {
-                        bForBound = b;
-                        b++;
-                    } else {
-                        aForBound = a;
-                        a++;
-                        b = 0;
-                        if (a == n) break outer;
-                    }
+    Cell[][] emptyCells = new Cell[n][n];
+    int a = 0, b = 0, aForBound = 0, bForBound = 0;
+
+    outer:
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (cells[i][j].getNumber() == 0) {
+                emptyCells[a][b] = cells[i][j];
+                if (b < n - 1) {
+                    bForBound = b;
+                    b++;
+                } else {
+                    aForBound = a;
+                    a++;
+                    b = 0;
+                    if (a == n) break outer;
                 }
             }
         }
-        if (a == 0 && b == 0) return;
-
-        Random random = new Random();
-        boolean putTwo = random.nextDouble() < 0.9;
-        int xCell = random.nextInt(aForBound + 1);
-        int yCell = random.nextInt(bForBound + 1);
-        int val = putTwo ? 2 : 4;
-        Text text = textMaker.madeText(Integer.toString(val), emptyCells[xCell][yCell].getX(), emptyCells[xCell][yCell].getY(), root);
-        emptyCells[xCell][yCell].setTextClass(text);
-        root.getChildren().add(text);
-        emptyCells[xCell][yCell].setColorByNumber(val);
     }
+
+    if (a == 0 && b == 0) return;
+
+    Random random = new Random();
+    boolean putTwo = random.nextDouble() < 0.9;
+    int xCell = random.nextInt(aForBound + 1);
+    int yCell = random.nextInt(bForBound + 1);
+    int val = putTwo ? 2 : 4;
+
+    Text text = textMaker.madeText(Integer.toString(val),
+            emptyCells[xCell][yCell].getX(), emptyCells[xCell][yCell].getY(), root);
+    emptyCells[xCell][yCell].setTextClass(text);
+    root.getChildren().add(text);
+    emptyCells[xCell][yCell].setColorByNumber(val);
+
+    // POP-OUT ANIMATION
+    emptyCells[xCell][yCell].getRectangle().setScaleX(0.1);
+    emptyCells[xCell][yCell].getRectangle().setScaleY(0.1);
+    text.setScaleX(0.1);
+    text.setScaleY(0.1);
+
+    ScaleTransition scaleRect = new ScaleTransition(Duration.millis(150), emptyCells[xCell][yCell].getRectangle());
+    scaleRect.setToX(1.0);
+    scaleRect.setToY(1.0);
+
+    ScaleTransition scaleText = new ScaleTransition(Duration.millis(150), text);
+    scaleText.setToX(1.0);
+    scaleText.setToY(1.0);
+
+    ParallelTransition popEffect = new ParallelTransition(scaleRect, scaleText);
+    popEffect.play();
+}
+
 
     private int haveEmptyCell() {
         for (int i = 0; i < n; i++)
@@ -358,7 +381,7 @@ private void moveLeft() {
 
     for (int i = 0; i < n; i++) {
         System.out.println("Row " + i + " -----------------------------");
-        
+
         int[] originalRow = new int[n];
         for (int j = 0; j < n; j++) {
             originalRow[j] = cells[i][j].getValue();
@@ -391,15 +414,22 @@ private void moveLeft() {
             }
         }
     }
-   if (isFirstMove) {
-    animateMovements(moves, null);
-    isFirstMove = false;
-} else {
-    animateMovements(moves, () -> randomFillNumber(1));
+
+    if (!moves.isEmpty()) {
+        if (isFirstMove) {
+            isFirstMove = false;
+            animateMovements(moves, () -> randomFillNumber(2));
+        } else {
+            animateMovements(moves, () -> randomFillNumber(1));
+        }
+    } else {
+        // Fallback: no movement but check if a tile can be spawned
+        if (!isFirstMove && haveEmptyCell() == 1) {
+            randomFillNumber(1);
+        }
+    }
 }
 
-
-}
 
 private void moveRight() {
     List<Movement> moves = new ArrayList<>();
@@ -439,18 +469,25 @@ private void moveRight() {
             }
         }
     }
-    if (isFirstMove) {
-    animateMovements(moves, null);
-    isFirstMove = false;
-} else {
-    animateMovements(moves, () -> randomFillNumber(1));
+
+    if (!moves.isEmpty()) {
+        if (isFirstMove) {
+            isFirstMove = false;
+            animateMovements(moves, () -> randomFillNumber(2));
+        } else {
+            animateMovements(moves, () -> randomFillNumber(1));
+        }
+    } else {
+        if (!isFirstMove && haveEmptyCell() == 1) {
+            randomFillNumber(1);
+        }
+    }
 }
 
-}
 
     
 
-   private void moveUp() {
+private void moveUp() {
     List<Movement> moves = new ArrayList<>();
 
     for (int j = 0; j < n; j++) {
@@ -488,18 +525,23 @@ private void moveRight() {
             }
         }
     }
-    if (isFirstMove) {
-    animateMovements(moves, null);
-    isFirstMove = false;
-} else {
-    animateMovements(moves, () -> randomFillNumber(1));
+
+    if (!moves.isEmpty()) {
+        if (isFirstMove) {
+            isFirstMove = false;
+            animateMovements(moves, () -> randomFillNumber(2));
+        } else {
+            animateMovements(moves, () -> randomFillNumber(1));
+        }
+    } else {
+        if (!isFirstMove && haveEmptyCell() == 1) {
+            randomFillNumber(1);
+        }
+    }
 }
 
-}
 
-
-
-    private void moveDown() {
+private void moveDown() {
     List<Movement> moves = new ArrayList<>();
 
     for (int j = 0; j < n; j++) {
@@ -537,14 +579,21 @@ private void moveRight() {
             }
         }
     }
-    if (isFirstMove) {
-    animateMovements(moves, null);
-    isFirstMove = false;
-} else {
-    animateMovements(moves, () -> randomFillNumber(1));
+
+    if (!moves.isEmpty()) {
+        if (isFirstMove) {
+            isFirstMove = false;
+            animateMovements(moves, () -> randomFillNumber(2));
+        } else {
+            animateMovements(moves, () -> randomFillNumber(1));
+        }
+    } else {
+        if (!isFirstMove && haveEmptyCell() == 1) {
+            randomFillNumber(1);
+        }
+    }
 }
 
-}
 
 
   
