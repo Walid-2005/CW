@@ -3,6 +3,7 @@ package com.example.demo;
 
 import javafx.util.Duration;
 import javafx.animation.ParallelTransition;
+import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -108,7 +109,7 @@ class GameScene {
         scoretext = new Text("0");
         scoretext.setFont(Font.font("Arial", 18));
         scoretext.setFill(Color.WHITE);
-        scoretext.relocate(862, 16);
+        scoretext.relocate(859, 16);
         root.getChildren().add(scoretext);
 
         highScoreText = new Text("HIGH SCORE: " + highScore);
@@ -208,39 +209,44 @@ class GameScene {
         }));
     }
     
-    private void animateMovements(List<Movement> movements) {
-    for (Movement m : movements) {
+   private void animateMovements(List<Movement> moves, Runnable onFinished) {
+    SequentialTransition seq = new SequentialTransition();
+
+    for (Movement m : moves) {
         Cell fromCell = cells[m.fromRow][m.fromCol];
         Cell toCell = cells[m.toRow][m.toCol];
 
-        double dx = (m.toCol - m.fromCol) * (LENGTH + distanceBetweenCells);
-        double dy = (m.toRow - m.fromRow) * (LENGTH + distanceBetweenCells);
+        TranslateTransition trans = new TranslateTransition(Duration.millis(100), fromCell.getRectangle());
+        trans.setToX((toCell.getX() - fromCell.getX()));
+        trans.setToY((toCell.getY() - fromCell.getY()));
 
-        TranslateTransition moveRect = new TranslateTransition(Duration.millis(150), fromCell.getRectangle());
-        moveRect.setByX(dx);
-        moveRect.setByY(dy);
+        TranslateTransition textTrans = new TranslateTransition(Duration.millis(100), fromCell.getText());
+        textTrans.setToX((toCell.getX() - fromCell.getX()));
+        textTrans.setToY((toCell.getY() - fromCell.getY()));
 
-        TranslateTransition moveText = new TranslateTransition(Duration.millis(150), fromCell.getText());
-        moveText.setByX(dx);
-        moveText.setByY(dy);
-
-        ParallelTransition pt = new ParallelTransition(moveRect, moveText);
-
+        ParallelTransition pt = new ParallelTransition(trans, textTrans);
         pt.setOnFinished(e -> {
-            // Reset position
+            if (m.value != 0) {
+                toCell.setValue(m.value);
+                fromCell.setValue(0);
+            }
+            // Reset translations to avoid ghosts
             fromCell.getRectangle().setTranslateX(0);
             fromCell.getRectangle().setTranslateY(0);
             fromCell.getText().setTranslateX(0);
             fromCell.getText().setTranslateY(0);
-
-            // Logical state change
-            toCell.setValue(m.value);
-            fromCell.setValue(0);
         });
 
-        pt.play();
+        seq.getChildren().add(pt);
     }
+
+    seq.setOnFinished(e -> {
+        if (onFinished != null) onFinished.run();
+    });
+
+    seq.play();
 }
+
 
 
 
@@ -343,6 +349,10 @@ class GameScene {
         } catch (IOException ignored) {}
     }
 
+
+
+    private boolean isFirstMove = true;
+
 private void moveLeft() {
     List<Movement> moves = new ArrayList<>();
 
@@ -381,8 +391,14 @@ private void moveLeft() {
             }
         }
     }
+   if (isFirstMove) {
+    animateMovements(moves, null);
+    isFirstMove = false;
+} else {
+    animateMovements(moves, () -> randomFillNumber(1));
+}
 
-    animateMovements(moves);
+
 }
 
 private void moveRight() {
@@ -423,13 +439,14 @@ private void moveRight() {
             }
         }
     }
-
-    animateMovements(moves);
+    if (isFirstMove) {
+    animateMovements(moves, null);
+    isFirstMove = false;
+} else {
+    animateMovements(moves, () -> randomFillNumber(1));
 }
 
-
-
-
+}
 
     
 
@@ -471,8 +488,13 @@ private void moveRight() {
             }
         }
     }
+    if (isFirstMove) {
+    animateMovements(moves, null);
+    isFirstMove = false;
+} else {
+    animateMovements(moves, () -> randomFillNumber(1));
+}
 
-    animateMovements(moves);
 }
 
 
@@ -515,13 +537,15 @@ private void moveRight() {
             }
         }
     }
-
-    animateMovements(moves);
+    if (isFirstMove) {
+    animateMovements(moves, null);
+    isFirstMove = false;
+} else {
+    animateMovements(moves, () -> randomFillNumber(1));
 }
 
+}
 
-
-  
 
   
 
