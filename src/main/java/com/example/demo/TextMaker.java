@@ -3,6 +3,7 @@ package com.example.demo;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 class TextMaker {
@@ -20,9 +21,24 @@ class TextMaker {
 
     Text madeText(String input, double xCell, double yCell, Group root) {
         double length = GameScene.getLENGTH();
-        double fontSize = (3 * length) / 7.0;
+
+        int value;
+        try {
+            value = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            value = 0;
+        }
+
+        int digits = (value == 0) ? 1 : String.valueOf(value).length();
+        int fontSize;
+
+        if (digits <= 2) fontSize = 40;
+        else if (digits == 3) fontSize = 34;
+        else if (digits == 4) fontSize = 28;
+        else fontSize = 22;
+
         Text text = new Text(input);
-        text.setFont(Font.font(fontSize));
+        text.setFont(Font.font("Verdana", FontWeight.BOLD, fontSize));
         text.relocate((xCell + (1.2)* length / 7.0), (yCell + 2 * length / 7.0));
         text.setFill(Color.WHITE);
 

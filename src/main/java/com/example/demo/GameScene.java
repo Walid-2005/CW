@@ -2,7 +2,9 @@ package com.example.demo;
 
 
 import javafx.util.Duration;
+import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
@@ -14,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -195,6 +198,7 @@ class GameScene {
             else if (key.getCode() == KeyCode.UP) moveUp();
             else if (key.getCode() == KeyCode.LEFT) moveLeft();
             else if (key.getCode() == KeyCode.RIGHT) moveRight();
+            else if (key.getCode() == KeyCode.T) spawnTest2048Tile();
             else return;
             emptyCellCheck = haveEmptyCell();
             if (emptyCellCheck == -1 && canNotMove()) {
@@ -371,7 +375,47 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
             writer.close();
         } catch (IOException ignored) {}
     }
+    
+    private void spawnTest2048Tile() {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (cells[i][j].getValue() == 0) {
+                cells[i][j].setValue(2048);
+                show2048Popup(); 
+                return;
+            }
+        }
+    }
+}
 
+
+
+
+    private boolean reached2048 = false;
+
+
+
+private void show2048Popup() {
+    Image image = new Image(getClass().getResource("/com/example/demo/congrats_2048.png").toExternalForm());
+    ImageView popupImage = new ImageView(image);
+
+    // Optional: Resize to fit nicely
+    popupImage.setFitWidth(300);
+    popupImage.setPreserveRatio(true);
+
+    // Center the image on screen
+    popupImage.setLayoutX((Main.WIDTH - popupImage.getFitWidth()) / 2);
+    popupImage.setLayoutY((Main.HEIGHT - 200) / 2);
+
+    root.getChildren().add(popupImage);
+
+    // Fade out over 6 seconds
+    FadeTransition fade = new FadeTransition(Duration.seconds(6), popupImage);
+    fade.setFromValue(1.0);
+    fade.setToValue(0.0);
+    fade.setOnFinished(e -> root.getChildren().remove(popupImage));
+    fade.play();
+}
 
 
     private boolean isFirstMove = true;

@@ -167,17 +167,31 @@ public class Cell {
         }
     }
 
-    public void setValue(int value) {
-        textClass.setText(Integer.toString(value));
-        setColorByNumber(value);
-        if (value == 0) {
-            root.getChildren().remove(textClass);
-        } else {
-            if (!root.getChildren().contains(textClass)) {
-                root.getChildren().add(textClass);
-            }
+   public void setValue(int value) {
+    textClass.setText(Integer.toString(value));
+    setColorByNumber(value);
+
+    // Uniform font 
+    int digits = String.valueOf(value).length();
+    int fontSize;
+
+    if (digits <= 2) fontSize = 40;
+    else if (digits == 3) fontSize = 34;
+    else if (digits == 4) fontSize = 28;
+    else fontSize = 22;
+
+    textClass.setFont(javafx.scene.text.Font.font("Verdana", javafx.scene.text.FontWeight.BOLD, fontSize));
+
+    if (value == 0) {
+        root.getChildren().remove(textClass);
+    } else {
+        if (!root.getChildren().contains(textClass)) {
+            root.getChildren().add(textClass);
         }
     }
+}
+
+
 
     // Required for animation
     public Rectangle getRectangle() {
