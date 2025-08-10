@@ -43,6 +43,8 @@ class GameScene {
     private Account currentAccount;
     private boolean leaderboardVisible = false;
     private final List<Text> leaderboardTexts = new ArrayList<>();
+    private javafx.scene.shape.Rectangle leaderboardBg;
+    private Text leaderboardTitle;
 
     static void setN(int number) {
         n = number;
@@ -74,6 +76,74 @@ class GameScene {
         logoView.setLayoutX((Main.WIDTH - 240) / 2.0);
         logoView.setLayoutY(-80);
         root.getChildren().add(logoView);
+
+  // Leaderboard button
+Button leaderboardButton = new Button("Leaderboard");
+leaderboardButton.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+leaderboardButton.setFont(Font.font("Arial", 13));
+leaderboardButton.setLayoutX(410);
+leaderboardButton.setLayoutY(130);
+root.getChildren().add(leaderboardButton);
+
+leaderboardButton.setOnAction(e -> {
+    if (!leaderboardVisible) {
+        leaderboardTexts.clear();
+        Collections.sort(Account.getAccounts());
+
+        // Create leaderboard background panel
+        double panelW = 420;
+        double panelH = 260;
+        double panelX = (Main.WIDTH - panelW) / 2.0;
+        double panelY = 200;
+
+        leaderboardBg = new javafx.scene.shape.Rectangle(panelX, panelY, panelW, panelH);
+        leaderboardBg.setArcWidth(24);
+        leaderboardBg.setArcHeight(24);
+        leaderboardBg.setFill(isDarkMode ? Color.rgb(20, 20, 20, 0.82) : Color.rgb(255, 255, 255, 0.82));
+        leaderboardBg.setStroke(isDarkMode ? Color.WHITE : Color.BLACK);
+        leaderboardBg.setStrokeWidth(1.2);
+        leaderboardBg.setEffect(new javafx.scene.effect.DropShadow(24, Color.rgb(0, 0, 0, 0.35)));
+
+        // Leaderboard title
+        leaderboardTitle = new Text("Leaderboard");
+        leaderboardTitle.setFont(Font.font("Arial", 24));
+        leaderboardTitle.setFill(isDarkMode ? Color.WHITE : Color.BLACK);
+        leaderboardTitle.setX(panelX + 24);
+        leaderboardTitle.setY(panelY + 42);
+
+        // Add leaderboard entries
+        int max = Math.min(Account.getAccounts().size(), 5);
+        double startY = panelY + 84;
+        for (int i = 0; i < max; i++) {
+            Account acc = Account.getAccounts().get(i);
+            Text t = new Text((i + 1) + ". " + acc.getUserName() + " — " + acc.getScore());
+            t.setFont(Font.font("Arial", 18));
+
+            if (i == 0) t.setFill(Color.GOLD);
+            else if (i == 1) t.setFill(Color.SILVER);
+            else if (i == 2) t.setFill(Color.BROWN);
+            else t.setFill(isDarkMode ? Color.WHITE : Color.BLACK);
+
+            t.setX(panelX + 24);
+            t.setY(startY + i * 34);
+
+            leaderboardTexts.add(t);
+        }
+
+        // Add everything to root
+        root.getChildren().add(leaderboardBg);
+        root.getChildren().add(leaderboardTitle);
+        root.getChildren().addAll(leaderboardTexts);
+
+        leaderboardVisible = true;
+    } else {
+        root.getChildren().remove(leaderboardBg);
+        root.getChildren().remove(leaderboardTitle);
+        root.getChildren().removeAll(leaderboardTexts);
+        leaderboardVisible = false;
+    }
+    root.requestFocus();
+});
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -122,47 +192,9 @@ class GameScene {
         highScoreText.relocate(20, 20);
         root.getChildren().add(highScoreText);
 
-                Button leaderboardButton = new Button("Leaderboard");
-                leaderboardButton.setStyle("-fx-background-color: black; -fx-text-fill: white;");
-                leaderboardButton.setFont(Font.font("Arial", 13));
-                leaderboardButton.setLayoutX(410);
-                leaderboardButton.setLayoutY(130);
-                root.getChildren().add(leaderboardButton);
+              
 
-                leaderboardButton.setOnAction(e -> {
-            if (!leaderboardVisible) {
-                leaderboardTexts.clear();
-                Collections.sort(Account.getAccounts());
-                int y = 220;
-                Text title = new Text("🏆 Leaderboard");
-                title.setFont(Font.font("Arial", 24));
-                title.setFill(Color.WHITE);
-                title.setX(320);
-                title.setY(y);
-                leaderboardTexts.add(title);
-                root.getChildren().add(title);
-                y += 40;
-                for (int i = 0; i < Math.min(Account.getAccounts().size(), 5); i++) {
-                    Account acc = Account.getAccounts().get(i);
-                    Text t = new Text((i + 1) + ". " + acc.getUserName() + ": " + acc.getScore());
-                    t.setFont(Font.font("Arial", 18));
-                    t.setFill(Color.WHITE);
-                    t.setX(250);
-                    t.setY(y);
-                    leaderboardTexts.add(t);
-                    root.getChildren().add(t);
-                    y += 30;
-                }
-                leaderboardVisible = true;
-            } else {
-                for (Text t : leaderboardTexts) {
-                    root.getChildren().remove(t);
-                }
-                leaderboardVisible = false;
-            }
-            root.requestFocus(); // to re-enable keyboard input
-        });
-
+                
 
         Button toggleMode = new Button("Dark Mode");
         toggleMode.setLayoutX(300);
@@ -203,11 +235,23 @@ class GameScene {
             emptyCellCheck = haveEmptyCell();
             if (emptyCellCheck == -1 && canNotMove()) {
                 currentAccount.addToScore(score);
-                Account.saveAccounts();
+                currentAccount.addToScore(score);
+            Account.saveAccounts();
+
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(500), root);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(ev -> {
                 primaryStage.setScene(endGameScene);
                 EndGame.getInstance().endGameShow(endGameScene, endGameRoot, primaryStage, score);
-                root.getChildren().clear();
-                score = 0;
+
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(500), endGameRoot);
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
+                fadeIn.play();
+            });
+            fadeOut.play();
+
             } 
         }));
     }

@@ -15,9 +15,25 @@
 
 .button:hover {
     -fx-background-color: #fff3b0;   /* warm pale yellow */
-    -fx-border-color: #f9c74f;       /* rich sunflower yellow */
-    -fx-text-fill: #b8860b;          /* goldenrod for contrast */
+    -fx-border-color: #f9c74f;       /* rich  yellow */
+    -fx-text-fill: #b8860b;          /* goldenred for contrast */
 }
 
 
+.leaderboard-title {
+  -fx-font-family: "Arial";
+  -fx-font-size: 24px;
+  -fx-font-weight: bold;
+  -fx-fill: white;
+}
+.leaderboard-item {
+  -fx-font-family: "Arial";
+  -fx-font-size: 18px;
+  -fx-fill: white;
+}
+
+/* Medal colors for top 3 ranks */
+.rank-1 { -fx-fill: #d4af37; }  
+.rank-2 { -fx-fill: #c0c0c0; }  
+.rank-3 { -fx-fill: #cd7f32; }  
 
