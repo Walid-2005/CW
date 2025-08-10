@@ -25,7 +25,16 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.*;
 
-class GameScene {
+/**
+ * Main controller for the 2048 game screen.
+ * <p>
+ * This class sets up the grid, handles keyboard input, runs movement/merge logic,
+ * updates scores and high score persistence, manages animations, theme toggling,
+ * and draws the on-screen leaderboard. It also coordinates the transition to the
+ * end-game screen.
+ * </p>
+ */
+public class GameScene {
     private static int HEIGHT = 500;
     private static int n = 4;
     private final static int distanceBetweenCells = 10;
@@ -46,15 +55,34 @@ class GameScene {
     private javafx.scene.shape.Rectangle leaderboardBg;
     private Text leaderboardTitle;
 
+    /**
+     * Sets the grid dimension (n x n) and recalculates the cell length based on HEIGHT.
+     *
+     * @param number grid size to use (e.g., 4 for a 4x4 board)
+     */
     static void setN(int number) {
         n = number;
         LENGTH = (HEIGHT - ((n + 1) * distanceBetweenCells)) / (double) n;
     }
 
+    /**
+     * @return the current pixel length of a single cell, derived from HEIGHT and n
+     */
     static double getLENGTH() {
         return LENGTH;
     }
 
+    /**
+     * Initializes the game scene: draws background and logo, builds the grid, wires buttons,
+     * loads high score, spawns initial tiles, and registers keyboard handlers.
+     *
+     * @param gameScene    the JavaFX Scene for gameplay
+     * @param root         the root node containing all game UI
+     * @param primaryStage main application window
+     * @param endGameScene the scene shown when the game ends
+     * @param endGameRoot  root of the end-game UI
+     * @param account      current player's account (used for leaderboard scoring)
+     */
     void game(Scene gameScene, Group root, Stage primaryStage, Scene endGameScene, Group endGameRoot, Account account) {
         this.root = root;
         gameScene.getStylesheets().add(getClass().getResource("/com/example/demo/home_buttons.css").toExternalForm());
@@ -256,6 +284,12 @@ leaderboardButton.setOnAction(e -> {
         }));
     }
     
+/**
+ * Runs the move animations for a batch of movements, then invokes a callback when done.
+ *
+ * @param moves      list of movements to animate
+ * @param onFinished callback to run after animations complete (e.g., spawn tile)
+ */
 private void animateMovements(List<Movement> moves, Runnable onFinished) {
     if (moves.isEmpty()) return; // ← No moves = no spawn
 
@@ -304,6 +338,11 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
 
     // Movement and Helper Methods
 
+    /**
+     * Spawns a new tile (2 or 4) at a random empty position and plays a pop animation.
+     *
+     * @param turn used to keep original behavior for initial spawns
+     */
     private void randomFillNumber(int turn) {
     Cell[][] emptyCells = new Cell[n][n];
     int a = 0, b = 0, aForBound = 0, bForBound = 0;
@@ -358,7 +397,11 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
     popEffect.play();
 }
 
-
+    /**
+     * Checks whether there is an empty cell or a 2048 tile.
+     *
+     * @return 1 if an empty cell exists, 0 if a 2048 tile exists, -1 otherwise
+     */
     private int haveEmptyCell() {
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++) {
@@ -367,9 +410,22 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
             }
         return -1;
     }
+
+    /**
+     * Immutable record of a single tile movement or merge during a move step.
+     */
     public class Movement {
         int fromRow, fromCol, toRow, toCol, value;
 
+        /**
+         * Constructs a movement from one cell to another, optionally carrying a merged value.
+         *
+         * @param fromRow source row
+         * @param fromCol source column
+         * @param toRow   destination row
+         * @param toCol   destination column
+         * @param value   resulting value to set at destination (0 if only a slide)
+         */
         public Movement(int fromRow, int fromCol, int toRow, int toCol, int value) {
         this.fromRow = fromRow;
         this.fromCol = fromCol;
@@ -379,11 +435,17 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
     }
 }
 
+    /**
+     * @return true if any horizontally/vertically adjacent pair shares the same number
+     */
     private boolean haveSameNumberNearly(int i, int j) {
         return (i < n - 1 && cells[i + 1][j].getNumber() == cells[i][j].getNumber()) ||
                (j < n - 1 && cells[i][j + 1].getNumber() == cells[i][j].getNumber());
     }
 
+    /**
+     * @return true if no more valid merges are possible anywhere on the board
+     */
     private boolean canNotMove() {
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -391,6 +453,9 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
         return true;
     }
 
+    /**
+     * Updates the score text and persists a higher high score when reached.
+     */
     private void updateScore() {
         scoretext.setText(score + "");
         if (score > highScore) {
@@ -400,6 +465,9 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
         }
     }
         
+    /**
+     * Loads the saved high score from file. Falls back to 0 if missing or invalid.
+     */
     private void loadHighScore() {
         try {
             if (highScoreFile.exists()) {
@@ -412,6 +480,9 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
         }
     }
 
+    /**
+     * Writes the current high score to file.
+     */
     private void saveHighScore() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(highScoreFile));
@@ -420,6 +491,9 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
         } catch (IOException ignored) {}
     }
     
+    /**
+     * Debug helper: force-spawn a 2048 tile and show a congratulatory popup.
+     */
     private void spawnTest2048Tile() {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -432,13 +506,11 @@ private void animateMovements(List<Movement> moves, Runnable onFinished) {
     }
 }
 
-
-
-
     private boolean reached2048 = false;
 
-
-
+    /**
+     * Shows a temporary image in the center of the screen and fades it out.
+     */
 private void show2048Popup() {
     Image image = new Image(getClass().getResource("/com/example/demo/congrats_2048.png").toExternalForm());
     ImageView popupImage = new ImageView(image);
@@ -461,9 +533,12 @@ private void show2048Popup() {
     fade.play();
 }
 
-
     private boolean isFirstMove = true;
 
+    /**
+     * Handles a left move: compacts values leftward, merges once per tile, updates score,
+     * collects animation steps, and spawns a new tile on completion.
+     */
 private void moveLeft() {
     List<Movement> moves = new ArrayList<>();
 
@@ -518,7 +593,9 @@ private void moveLeft() {
     }
 }
 
-
+    /**
+     * Handles a right move (mirror of left move).
+     */
 private void moveRight() {
     List<Movement> moves = new ArrayList<>();
 
@@ -574,7 +651,10 @@ private void moveRight() {
 
 
     
-
+    /**
+     * Handles an up move: compacts upward, merges once per tile, updates score,
+     * collects animations, and spawns a new tile on completion.
+     */
 private void moveUp() {
     List<Movement> moves = new ArrayList<>();
 
@@ -628,7 +708,9 @@ private void moveUp() {
     }
 }
 
-
+    /**
+     * Handles a down move (mirror of up move).
+     */
 private void moveDown() {
     List<Movement> moves = new ArrayList<>();
 
@@ -685,7 +767,9 @@ private void moveDown() {
 
 
   
-
+    /**
+     * Legacy helper used by earlier movement logic to move horizontally with merge checks.
+     */
   private void moveHorizontally(int i, int j, int des, int sign) {
         if (isValidDesH(i, j, des, sign)) {
             score += cells[i][j].adder(cells[i][des + sign]);
@@ -696,6 +780,9 @@ private void moveDown() {
         }
     }
 
+    /**
+     * Legacy helper used by earlier movement logic to move vertically with merge checks.
+     */
  private void moveVertically(int i, int j, int des, int sign) {
     if (isValidDesV(i, j, des, sign)) {
         // Valid merge
@@ -711,6 +798,9 @@ private void moveDown() {
 
 
   
+    /**
+     * Validates a horizontal merge destination.
+     */
     private boolean isValidDesH(int i, int j, int des, int sign) {
         return (des + sign < n && des + sign >= 0 &&
                 cells[i][des + sign].getNumber() == cells[i][j].getNumber() &&
@@ -718,6 +808,9 @@ private void moveDown() {
                 cells[i][des + sign].getNumber() != 0);
     }
 
+    /**
+     * Validates a vertical merge destination.
+     */
     private boolean isValidDesV(int i, int j, int des, int sign) {
         return (des + sign < n && des + sign >= 0 &&
                 cells[des + sign][j].getNumber() == cells[i][j].getNumber() &&
@@ -725,6 +818,14 @@ private void moveDown() {
                 cells[des + sign][j].getNumber() != 0);
     }
 
+    /**
+     * Finds the furthest empty coordinate a tile can slide to in a given direction.
+     *
+     * @param i      row index
+     * @param j      column index
+     * @param direct direction code: 'l', 'r', 'u', 'd'
+     * @return destination coordinate along the axis being moved
+     */
     private int passDestination(int i, int j, char direct) {
         int coordinate = j;
         if (direct == 'l') {

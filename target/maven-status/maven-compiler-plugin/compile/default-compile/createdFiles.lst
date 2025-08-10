@@ -4,6 +4,5 @@ com/example/demo/TextMaker.class
 com/example/demo/EndGame.class
 com/example/demo/GameScene$Movement.class
 com/example/demo/Account.class
-com/example/demo/TestEndGame.class
 com/example/demo/Controller.class
 com/example/demo/Main.class

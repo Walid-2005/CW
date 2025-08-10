@@ -1,0 +1,53 @@
+-J-Duser.language=
+-J-Duser.country=
+@options
+@packages
+-classpath
+'/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-controls/19.0.2.1/javafx-controls-19.0.2.1.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-controls/19.0.2.1/javafx-controls-19.0.2.1-mac-aarch64.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-graphics/19.0.2.1/javafx-graphics-19.0.2.1.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-graphics/19.0.2.1/javafx-graphics-19.0.2.1-mac-aarch64.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-base/19.0.2.1/javafx-base-19.0.2.1.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-base/19.0.2.1/javafx-base-19.0.2.1-mac-aarch64.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-fxml/19.0.2.1/javafx-fxml-19.0.2.1.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-fxml/19.0.2.1/javafx-fxml-19.0.2.1-mac-aarch64.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-media/19.0.2.1/javafx-media-19.0.2.1.jar:/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-media/19.0.2.1/javafx-media-19.0.2.1-mac-aarch64.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/waleedkhaled/Desktop/CW/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2025. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/waleedkhaled/Desktop/CW/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'CW 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'CW 1.0-SNAPSHOT API'
+com.example.demo
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-controls/19.0.2.1/javafx-controls-19.0.2.1.jar = 1674151899000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-controls/19.0.2.1/javafx-controls-19.0.2.1-mac-aarch64.jar = 1674151900000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-graphics/19.0.2.1/javafx-graphics-19.0.2.1.jar = 1674152000000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-graphics/19.0.2.1/javafx-graphics-19.0.2.1-mac-aarch64.jar = 1674152015000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-base/19.0.2.1/javafx-base-19.0.2.1.jar = 1674151828000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-base/19.0.2.1/javafx-base-19.0.2.1-mac-aarch64.jar = 1674151834000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-fxml/19.0.2.1/javafx-fxml-19.0.2.1.jar = 1674151951000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-fxml/19.0.2.1/javafx-fxml-19.0.2.1-mac-aarch64.jar = 1674151991000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-media/19.0.2.1/javafx-media-19.0.2.1.jar = 1674152061000
+/Users/waleedkhaled/.m2/repository/org/openjfx/javafx-media/19.0.2.1/javafx-media-19.0.2.1-mac-aarch64.jar = 1674152083000
+/Users/waleedkhaled/Desktop/CW/src/main/java/.DS_Store = 1754847857599
+/Users/waleedkhaled/Desktop/CW/src/main/java = 1754315682289
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/tag-search-index.js = 1754847867472
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/overview-tree.html = 1754847867466
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/module-search-index.js = 1754847867471
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/index.html = 1754847867479
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/package-search-index.js = 1754847867471
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/serialized-form.html = 1754847867454
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/index-all.html = 1754847867477
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/allpackages-index.html = 1754847867471
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/member-search-index.js = 1754847867472
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/help-doc.html = 1754847867480
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/element-list = 1754847867445
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/search.html = 1754847867478
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/allclasses-index.html = 1754847867470
+/Users/waleedkhaled/Desktop/CW/target/reports/apidocs/type-search-index.js = 1754847867472

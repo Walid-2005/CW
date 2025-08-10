@@ -14,26 +14,46 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.Optional;
 
+/**
+ * Entry point for the 2048 game application.
+ * <p>
+ * Manages application lifecycle, user login, and initialization of game and leaderboard screens.
+ * Implements methods for starting, restarting, and showing the leaderboard.
+ */
 public class Main extends Application {
+
+    /** Width of the application window. */
     static final int WIDTH = 900;
+
+    /** Height of the application window. */
     static final int HEIGHT = 900;
 
+    /** Root node for the main game scene. */
     private Group gameRoot;
+
+    /** Main game scene. */
     private Scene gameScene;
+
+    /** The currently logged-in account. */
     private static Account currentAccount;
 
+    /**
+     * Initializes and starts the application.
+     *
+     * @param primaryStage the primary window (stage) for the application
+     */
     @Override
     public void start(Stage primaryStage) {
         Parameters params = getParameters();
         boolean debugMode = params.getRaw().contains("--debug");
 
-        // Load accounts from file
+        // Load saved accounts
         Account.loadAccounts();
 
+        // Handle user login or debug account
         if (debugMode) {
             currentAccount = Account.makeNewAccount("debugUser");
         } else {
-            // Prompt for username
             TextInputDialog dialog = new TextInputDialog("Player");
             dialog.setTitle("Enter Username");
             dialog.setHeaderText("Welcome to 2048!");
@@ -49,33 +69,42 @@ public class Main extends Application {
             }
         }
 
-        // Initialize game and endgame roots/scenes
+        // Create game and endgame scenes
         gameRoot = new Group();
-        gameScene = new Scene(gameRoot, WIDTH, HEIGHT); // no background color needed
+        gameScene = new Scene(gameRoot, WIDTH, HEIGHT);
         Group endgameRoot = new Group();
         Scene endGameScene = new Scene(endgameRoot, WIDTH, HEIGHT);
 
-        // Start the game
+        // Start game
         GameScene game = new GameScene();
         game.game(gameScene, gameRoot, primaryStage, endGameScene, endgameRoot, currentAccount);
 
-        // Set scene and show
+        // Display main game scene
         primaryStage.setScene(gameScene);
         primaryStage.setTitle("2048");
         primaryStage.show();
 
-        // Ensure the root has focus to receive keyboard input
+        // Ensure focus for keyboard input
         gameRoot.requestFocus();
 
-        // Save accounts on close
+        // Save accounts when closing
         primaryStage.setOnCloseRequest(e -> Account.saveAccounts());
     }
 
+    /**
+     * Application entry point.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
-    // Restart game method
+    /**
+     * Restarts the game with the same user account.
+     *
+     * @param primaryStage the main application stage
+     */
     public static void restartGame(Stage primaryStage) {
         Group gameRoot = new Group();
         Scene gameScene = new Scene(gameRoot, WIDTH, HEIGHT);
@@ -86,14 +115,22 @@ public class Main extends Application {
         game.game(gameScene, gameRoot, primaryStage, endGameScene, endGameRoot, currentAccount);
 
         primaryStage.setScene(gameScene);
-        gameRoot.requestFocus(); // important for keyboard input on restart
+        gameRoot.requestFocus();
     }
 
-    // Show leaderboard method
+    /**
+     * Displays the leaderboard scene.
+     * <p>
+     * Reads leaderboard entries from a text file and displays them.
+     * Provides a back button to return to the game.
+     *
+     * @param stage the current stage to display the leaderboard on
+     */
     public static void showLeaderboard(Stage stage) {
         Group leaderboardRoot = new Group();
         Scene leaderboardScene = new Scene(leaderboardRoot, WIDTH, HEIGHT);
 
+        // Leaderboard title
         Text title = new Text("Leaderboard");
         title.setFont(Font.font("Arial", 30));
         title.setFill(Color.WHITE);
@@ -101,6 +138,7 @@ public class Main extends Application {
         title.setLayoutY(50);
         leaderboardRoot.getChildren().add(title);
 
+        // Load leaderboard entries
         File leaderboardFile = new File("src/main/resources/leaderboard.txt");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(leaderboardFile));
@@ -123,6 +161,7 @@ public class Main extends Application {
             e.printStackTrace();
         }
 
+        // Back button
         Button backButton = new Button("Back");
         backButton.setLayoutX(450);
         backButton.setLayoutY(HEIGHT - 60);
