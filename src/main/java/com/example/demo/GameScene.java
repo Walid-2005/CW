@@ -263,7 +263,6 @@ leaderboardButton.setOnAction(e -> {
             emptyCellCheck = haveEmptyCell();
             if (emptyCellCheck == -1 && canNotMove()) {
                 currentAccount.addToScore(score);
-                currentAccount.addToScore(score);
             Account.saveAccounts();
 
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), root);
